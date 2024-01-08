@@ -10,16 +10,17 @@ import model
 import server
 
 os.system("dropdb ratings")
-os.system('createdb ratings')
+os.system("createdb ratings")
 
 model.connect_to_db(server.app)
 model.db.create_all()
 
-with open('data/movies.json') as f:
+# Load movie data from JSON file
+with open("data/movies.json") as f:
     movie_data = json.loads(f.read())
 
 # Create movies, store them in list so we can use them
-# to create fake ratings later
+# to create fake ratings
 movies_in_db = []
 for movie in movie_data:
     title, overview, poster_path = (
@@ -35,15 +36,15 @@ for movie in movie_data:
 model.db.session.add_all(movies_in_db)
 model.db.session.commit()
 
-
+# Create 10 users; each user will make 10 ratings
 for n in range(10):
-    email = f"user{n}@test.com"
+    email = f"user{n}@test.com"  # Voila! A unique email!
     password = "test"
 
     user = crud.create_user(email, password)
     model.db.session.add(user)
 
-    for m in range(10):
+    for _ in range(10):
         random_movie = choice(movies_in_db)
         score = randint(1, 5)
 
